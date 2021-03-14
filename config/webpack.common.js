@@ -3,9 +3,7 @@ const fs = require('fs');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const { PROJECT, generateHtmlFiles } = require('./helpers');
-
-const htmlFiles = generateHtmlFiles('../src/html/pages');
+const { PROJECT } = require('./helpers');
 
 module.exports = {
 	experiments: {
@@ -45,7 +43,13 @@ module.exports = {
 			},
 		],
 	},
-	plugins: [new CleanWebpackPlugin(), ...htmlFiles],
+	plugins: [
+		new MiniCssExtractPlugin({
+			filename: '[name].[contenthash].css',
+			chunkFilename: '[name].[contenthash].css',
+		}),
+		new CleanWebpackPlugin(),
+	],
 	resolve: {
 		extensions: ['.js'],
 	},

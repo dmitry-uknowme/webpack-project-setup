@@ -1,35 +1,59 @@
 const common = require('./webpack.common');
 const { merge } = require('webpack-merge');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { styleHandler, generateHtmlFiles } = require('./helpers');
+
+const isDev = false;
+const htmlFiles = generateHtmlFiles('../src/html/pages', isDev);
 
 const prodConfig = {
 	mode: 'production',
-	// module: {
-	// 	rules: [
-	// 		{
-	// 			test: /\.css$/,
-	// 			use: [
-	// 				MiniCssExtractPlugin.loader,
-	// 				{
-	// 					loader: 'css-loader',
-	// 					options: {
-	// 						modules: true,
-	// 						localIdentName: '[path]_[name]_[local]',
-	// 					},
-	// 				},
-	// 			],
-	// 		},
-	// 	],
-	// },
-	optimization: { splitChunks: { chunks: 'all' } },
+	module: {
+		rules: [
+			{
+				test: /\.global\.s[ac]ss$/,
+				use: styleHandler(isDev, {}, 'sass-loader'),
+			},
 
-	plugins: [
-		new MiniCssExtractPlugin({
-			filename: '[name].[contenthash].css',
-			chunkFilename: '[name].[contenthash].css',
-		}),
-	],
+			{
+				test: /\.s[ac]ss$/,
+				exclude: /\.global\.s[ac]ss$/,
+
+				use: styleHandler(
+					isDev,
+					{
+						modules: true,
+						localIdentName: '[name]__[local]',
+						sourceMap: true,
+					},
+					'sass-loader'
+				),
+			},
+
+			{
+				test: /\.global\.css$/,
+				use: styleHandler(isDev),
+			},
+
+			{
+				test: /\.css$/,
+				exclude: /\.global\.css$/,
+				use: styleHandler(isDev, {
+					modules: true,
+					localIdentName: '[name]__[local]',
+					sourceMap: true,
+				}),
+			},
+		],
+	},
+	optimization: {
+		splitChunks: { chunks: 'all' },
+		minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
+	},
+
+	plugins: [...htmlFiles],
 };
 
 module.exports = merge(common, prodConfig);

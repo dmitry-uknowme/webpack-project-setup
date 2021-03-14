@@ -1,14 +1,14 @@
 const { HotModuleReplacementPlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const path = require('path');
 const common = require('./webpack.common');
 const { merge } = require('webpack-merge');
-
-const { styleLoader } = require('./helpers');
-
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const { styleHandler, generateHtmlFiles } = require('./helpers');
 
 const isDev = true;
+
+const htmlFiles = generateHtmlFiles('../src/html/pages', isDev);
 
 const devConfig = {
 	mode: 'development',
@@ -25,46 +25,37 @@ const devConfig = {
 		rules: [
 			{
 				test: /\.global\.s[ac]ss$/,
-				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+				use: styleHandler(isDev, {}, 'sass-loader'),
 			},
 
 			{
 				test: /\.s[ac]ss$/,
 				exclude: /\.global\.s[ac]ss$/,
 
-				use: [
-					MiniCssExtractPlugin.loader,
+				use: styleHandler(
+					isDev,
 					{
-						loader: 'css-loader',
-						options: {
-							modules: true,
-							localIdentName: '[name]__[local]',
-							sourceMap: true,
-						},
+						modules: true,
+						localIdentName: '[name]__[local]',
+						sourceMap: true,
 					},
-					'sass-loader',
-				],
+					'sass-loader'
+				),
 			},
 
 			{
 				test: /\.global\.css$/,
-				use: [MiniCssExtractPlugin.loader, 'css-loader'],
+				use: styleHandler(isDev),
 			},
 
 			{
 				test: /\.css$/,
 				exclude: /\.global\.css$/,
-				use: [
-					MiniCssExtractPlugin.loader,
-					{
-						loader: 'css-loader',
-						options: {
-							modules: true,
-							localIdentName: '[name]__[local]',
-							sourceMap: true,
-						},
-					},
-				],
+				use: styleHandler(isDev, {
+					modules: true,
+					localIdentName: '[name]__[local]',
+					sourceMap: true,
+				}),
 			},
 		],
 	},
@@ -76,6 +67,7 @@ const devConfig = {
 		new MiniCssExtractPlugin(),
 		new HotModuleReplacementPlugin(),
 		new ReactRefreshWebpackPlugin(),
+		...htmlFiles,
 	],
 };
 
