@@ -17,7 +17,8 @@ function generateHtmlFiles(templateDir, isDev) {
 		const name = parts[0];
 		const extension = parts[1];
 		return new HtmlPlugin({
-			filename: `${name}.html`,
+			// filename: filename(name, 'html', isDev),  //dont work
+			filename: `${name}${!isDev ? '.[contenthash]' : ''}.html`,
 			template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`),
 			minify: {
 				collapseWhitespace: !isDev,
@@ -26,6 +27,10 @@ function generateHtmlFiles(templateDir, isDev) {
 			hash: true,
 		});
 	});
+}
+
+function filename(name, ext, isDev) {
+	return ` ${name}${!isDev ? '.[contenthash]' : ''}.${ext}`;
 }
 
 const styleHandler = (isDev, cssOptions, preProcessor) => {
@@ -52,6 +57,7 @@ const styleHandler = (isDev, cssOptions, preProcessor) => {
 
 module.exports = {
 	PROJECT,
+	filename,
 	styleHandler,
 	generateHtmlFiles,
 };

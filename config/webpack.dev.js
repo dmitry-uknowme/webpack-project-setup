@@ -4,7 +4,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const path = require('path');
 const common = require('./webpack.common');
 const { merge } = require('webpack-merge');
-const { styleHandler, generateHtmlFiles } = require('./helpers');
+const { styleHandler, filename, generateHtmlFiles } = require('./helpers');
 
 const isDev = true;
 
@@ -12,6 +12,9 @@ const htmlFiles = generateHtmlFiles('../src/html/pages', isDev);
 
 const devConfig = {
 	mode: 'development',
+	output: {
+		filename: filename('[name]', 'js', isDev),
+	},
 	devtool: 'eval',
 	devServer: {
 		contentBase: path.resolve(__dirname, '../build'),
@@ -64,7 +67,9 @@ const devConfig = {
 		// require('postcss-preset-env')({
 		// 	browsers: 'last 2 versions',
 		// }),
-		new MiniCssExtractPlugin(),
+		new MiniCssExtractPlugin({
+			filename: filename('[name]', 'css', isDev),
+		}),
 		new HotModuleReplacementPlugin(),
 		new ReactRefreshWebpackPlugin(),
 		...htmlFiles,

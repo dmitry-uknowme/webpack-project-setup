@@ -1,14 +1,3 @@
-// // import './style/header.sass';
-// // import './style/footer.module.sass';
-// // import './style/style.css';
+import './styles/index.sass';
 
-import './style/header.sass';
-
-// // import style from './style/footer.module.sass';
-
-import './style/index.global.sass';
-
-// import index from './style/index.global.sass';
-
-// console.log(index);
 console.log('hello webpack');

@@ -1,15 +1,21 @@
 const common = require('./webpack.common');
 const { merge } = require('webpack-merge');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 
-const { styleHandler, generateHtmlFiles } = require('./helpers');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+const { styleHandler, filename, generateHtmlFiles } = require('./helpers');
 
 const isDev = false;
 const htmlFiles = generateHtmlFiles('../src/html/pages', isDev);
 
 const prodConfig = {
 	mode: 'production',
+	output: {
+		filename: filename('[name]', 'js', isDev),
+	},
 	module: {
 		rules: [
 			{
@@ -50,10 +56,34 @@ const prodConfig = {
 	},
 	optimization: {
 		splitChunks: { chunks: 'all' },
-		minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
+		minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
 	},
 
-	plugins: [...htmlFiles],
+	plugins: [
+		new MiniCssExtractPlugin({
+			filename: filename('[name]', 'css', isDev),
+		}),
+		new ImageMinimizerPlugin({
+			minimizerOptions: {
+				plugins: [
+					['gifsicle', { interlaced: true }],
+					['jpegtran', { progressive: true }],
+					['optipng', { optimizationLevel: 5 }],
+					[
+						'svgo',
+						{
+							plugins: [
+								{
+									removeViewBox: false,
+								},
+							],
+						},
+					],
+				],
+			},
+		}),
+		...htmlFiles,
+	],
 };
 
 module.exports = merge(common, prodConfig);
