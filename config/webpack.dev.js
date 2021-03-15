@@ -1,9 +1,11 @@
+const common = require('./webpack.common');
+const { merge } = require('webpack-merge');
+const path = require('path');
+
 const { HotModuleReplacementPlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const path = require('path');
-const common = require('./webpack.common');
-const { merge } = require('webpack-merge');
+
 const { styleHandler, filename, generateHtmlFiles } = require('./helpers');
 
 const isDev = true;

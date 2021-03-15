@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const { PROJECT } = require('./helpers');
@@ -19,7 +19,8 @@ module.exports = {
 			{
 				test: /\.html$/,
 				include: path.resolve(__dirname, '../src/html/includes'),
-				use: [{ loader: 'raw-loader', options: { esModule: false } }],
+				// use: [{ loader: 'raw-loader', options: { esModule: false } }],
+				use: [{ loader: 'html-loader', options: { esModule: false } }],
 			},
 			{
 				test: /.js$/,
